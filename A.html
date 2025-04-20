@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>店舗検索</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    label {
+      margin-right: 10px;
+    }
+    .result {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>模擬店検索（AND検索）</h1>
+
+  <h3>1. 位置を選択</h3>
+  <label><input type="radio" name="location" value="北"> 北側</label>
+  <label><input type="radio" name="location" value="南"> 南側</label>
+
+  <h3>2. 通路の側を選択</h3>
+  <label><input type="radio" name="side" value="左"> 左側</label>
+  <label><input type="radio" name="side" value="右"> 右側</label>
+
+  <h3>3. 料理名（カンマ区切り）</h3>
+  <input type="text" id="foodInput" placeholder="例：焼きそば, 唐揚げ" size="40">
+
+  <br><br>
+  <button onclick="search()">検索</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    const stores = [
+      { name: "1-A 焼きそば屋", location: "北", side: "左", menu: ["焼きそば", "唐揚げ"] },
+      { name: "2-B たこ焼き屋", location: "南", side: "右", menu: ["たこ焼き"] },
+      { name: "3-C チュロス屋", location: "北", side: "右", menu: ["チュロス", "ジュース"] },
+      { name: "4-D フランク屋", location: "南", side: "左", menu: ["フランクフルト", "ポテト"] }
+    ];
+
+    function search() {
+      const location = document.querySelector('input[name="location"]:checked');
+      const side = document.querySelector('input[name="side"]:checked');
+      const foodsInput = document.getElementById("foodInput").value;
+
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "";
+
+      if (!location || !side || !foodsInput.trim()) {
+        resultDiv.innerHTML = "※すべての項目を入力・選択してください";
+        return;
+      }
+
+      const selectedLocation = location.value;
+      const selectedSide = side.value;
+      const foodList = foodsInput.split(",").map(f => f.trim());
+
+      // AND検索で条件を満たす店舗をフィルタ
+      const matchedStores = stores.filter(store =>
+        store.location === selectedLocation &&
+        store.side === selectedSide &&
+        foodList.every(food => store.menu.includes(food))
+      );
+
+      if (matchedStores.length === 0) {
+        resultDiv.innerHTML = "条件に合う店舗は見つかりませんでした。";
+      } else {
+        matchedStores.forEach(store => {
+          resultDiv.innerHTML += `<p><strong>${store.name}</strong><br>メニュー：${store.menu.join("、")}</p>`;
+        });
+      }
+    }
+  </script>
+</body>
+</html>
